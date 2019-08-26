@@ -33,20 +33,22 @@ void main() {
   <body>
     <a-scene fog="type: exponential; color: #333; density: 0.01" light="defaultLightsEnabled: false">
       <a-entity id="walls" position="0 0 0">
-        <a-entity  position="-7 4 -12" geometry="primitive: box; width: 10; height: 8" material="shader: brix"></a-entity>
-        <a-entity  position="-2 4 -5" geometry="primitive: box; width: 15; height: 8" rotation="0 -90 0" material="shader: brix"></a-entity>
-        <a-entity position="-12 7 -4" geometry="width: 8; height: 15; depth: 12" rotation="0 -90 0" material="shader: brix"></a-entity>
-        <a-entity position="-12 4 4" geometry="width: 15; height: 8" rotation="0 -90 0" material="shader: brix"></a-entity>
-        <a-entity position="-5 4 11" geometry="width: 15; height: 8" rotation="" material="shader: brix"></a-entity>
-        <a-entity position="-2 10.85 12" geometry="width: 8; height: 22; depth: 12" rotation="" material="shader: brix"></a-entity>
-        <a-entity position="4 4 11" geometry="width: 15; height: 8" rotation="" material="shader: brix"></a-entity>
-        <a-entity position="1 6 0" geometry="width: 8; height: 14; depth: 5" rotation="" material="shader: brix"></a-entity>
-        <a-entity position="11 4 0" geometry="width: 23; height: 8" rotation="0 90 0" material="shader: brix"></a-entity>
-        <a-entity position="7 10 -11" geometry="width: 10; height: 22; depth: 12" rotation="" material="shader: brix"></a-entity>
+        <a-entity  position="-7 4 -12" geometry="primitive: box; width: 10; height: 8" material=""></a-entity>
+        <a-entity  position="-2 4 -5" geometry="primitive: box; width: 15; height: 8" rotation="0 -90 0" material=""></a-entity>
+        <a-entity position="-12 7 -4" geometry="width: 8; height: 15; depth: 12" rotation="0 -90 0" material=""></a-entity>
+        <a-entity position="-12 4 4" geometry="width: 15; height: 8" rotation="0 -90 0" material=""></a-entity>
+        <a-entity position="-5 4 11" geometry="width: 15; height: 8" rotation="" material=""></a-entity>
+        <a-entity position="-2 10.85 12" geometry="width: 8; height: 22; depth: 12" rotation="" material=""></a-entity>
+        <a-entity position="4 4 11" geometry="width: 15; height: 8" rotation="" material=""></a-entity>
+        <a-entity position="1 6 0" geometry="width: 8; height: 14; depth: 5" rotation="" material=""></a-entity>
+        <a-entity position="11 4 0" geometry="width: 23; height: 8" rotation="0 90 0" material=""></a-entity>
+        <a-entity position="7 10 -11" geometry="width: 10; height: 22; depth: 12" rotation="" material=""></a-entity>
       </a-entity>
 
-      <a-entity camera look-controls position="-7 1.6 -7" rotation="0 90 0" id="player">
-        <a-entity id="light" position="0 -6 0" rotation="90 0 0" light="type: spot; color: #BBB; intensity: 0.4"></a-entity>
+      <a-entity position="-14 1.6 -10" rotation="0 -90 0" id="player">
+        <a-entity camera look-controls position="0 0 0">
+          <a-entity  id="light" position="0 0 0" rotation="0 0 0" light="type: spot; color: #BBB; intensity: 0.4"></a-entity>
+          </a-entity>
       </a-entity>
 
       <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="30" height="30" color="#4a3d39"></a-plane>
@@ -58,22 +60,104 @@ void main() {
      var playerEl = document.querySelector('#player');
      console.log(playerEl.getAttribute('position'));
 
-     let checkpoints = {
-       stop1: {x: 2, y: 2, z: 5},
-       stop2: {x: 5, y: 2, z: 8},
-       strop: {x: 7, y: 2, z: 5}
+     const checkpoints = {
+       1: {
+         axis: 'x',
+         player: {x: -12, z: -10},
+
+       },
+       2: {
+         axis: 'x',
+         player: {x: -5, z: -10},
+
+       },
+       3: {
+         axis: 'z',
+         player: {x: -5, z: 3},
+       },
+       4: {
+         axis: 'x',
+         player: {x: -8, z: 3},
+       },
+
+       5: {
+         axis: 'z',
+         player: {x: -8, z: 7},
+       },
+       6: {
+         axis: 'z',
+         player: {x: -8, z: 3},
+       },
+       7: {
+         axis: 'x',
+         player: {x: 4, z: 3},
+       },
+       8: {
+         axis: 'z',
+         player: {x: 4, z: 7.5},
+       },
+       9: {
+         axis: 'x',
+         player: {x: 7.5, z: 7.5},
+       },
+       10: {
+         axis: 'z',
+         player: {x: 7.5, z: -4},
+       },
+       11: {
+         axis: 'x',
+         player: {x: 0, z: -4},
+       },
+       12: {
+         axis: 'z',
+         player: {x: 0, z: -14}
+       }
+     }
+
+     let state = {
+       current: 1
+     }
+     let speed = 0.05;
+
+     function checkAxis (current) {
+       let axis = current.axis;
+       let player_goal = current.player;
+       let player_ax = playerEl.object3D.position[axis];
+       let goal_ax = player_goal[axis];
+
+       if (player_ax <= goal_ax) {
+         playerEl.object3D.position[axis] += speed;
+       } else if (player_ax >= goal_ax) {
+         playerEl.object3D.position[axis] -= speed;
+       }
+
+       if (playerEl.object3D.position[axis].toFixed(2) == goal_ax) {
+         return true;
+       } else {
+         return false;
+       }
+     }
+
+     function handlePosition () {
+       let current = checkpoints[state.current];
+
+       if (current) {
+         let checked = checkAxis(current);
+         if (checked) {
+           state.current += 1;
+           console.log("CHECK PLEASE")
+         }
+       } else {
+         console.log("ALRIGHT")
+       }
      }
 
 
      function moveCam(dt) {
-       playerEl.object3D.position.x += 0.01;
-
+       handlePosition();
        window.requestAnimationFrame(moveCam);
      }
-
      let aF = window.requestAnimationFrame(moveCam);
-
-
 
     </script>
   </body>
