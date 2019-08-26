@@ -58,77 +58,73 @@ void main() {
 
     <script>
      var playerEl = document.querySelector('#player');
-     console.log(playerEl.getAttribute('position'));
 
      const checkpoints = {
        1: {
-         axis: 'x',
-         player: {x: -12, z: -10},
-
+         a: 'x',
+         p: {x: -12}
        },
        2: {
-         axis: 'x',
-         player: {x: -5, z: -10},
-
+         a: 'x',
+         p: {x: -5},
        },
        3: {
-         axis: 'z',
-         player: {x: -5, z: 3},
+         a: 'z',
+         p: {z: 3},
        },
        4: {
-         axis: 'x',
-         player: {x: -8, z: 3},
+         a: 'x',
+         p: {x: -8},
        },
-
        5: {
-         axis: 'z',
-         player: {x: -8, z: 7},
+         a: 'z',
+         p: {z: 7},
        },
        6: {
-         axis: 'z',
-         player: {x: -8, z: 3},
+         a: 'z',
+         p: {z: 3},
        },
        7: {
-         axis: 'x',
-         player: {x: 4, z: 3},
+         a: 'x',
+         p: {z: 3},
        },
        8: {
-         axis: 'z',
-         player: {x: 4, z: 7.5},
+         a: 'z',
+         p: {z: 7.5},
        },
        9: {
-         axis: 'x',
-         player: {x: 7.5, z: 7.5},
+         a: 'x',
+         p: {x: 7.5},
        },
        10: {
-         axis: 'z',
-         player: {x: 7.5, z: -4},
+         a: 'z',
+         p: {z: -4},
        },
        11: {
-         axis: 'x',
-         player: {x: 0, z: -4},
+         a: 'x',
+         p: {x: 0},
        },
        12: {
-         axis: 'z',
-         player: {x: 0, z: -14}
+         a: 'z',
+         p: {z: -14}
        }
      }
 
      let state = {
-       current: 1
+       current: 1,
+       speed: 0.05
      }
-     let speed = 0.05;
 
      function checkAxis (current) {
-       let axis = current.axis;
-       let player_goal = current.player;
+       let axis = current.a;
+       let pos = current.p;
        let player_ax = playerEl.object3D.position[axis];
-       let goal_ax = player_goal[axis];
+       let goal_ax = pos[axis];
 
        if (player_ax <= goal_ax) {
-         playerEl.object3D.position[axis] += speed;
+         playerEl.object3D.position[axis] += state.speed;
        } else if (player_ax >= goal_ax) {
-         playerEl.object3D.position[axis] -= speed;
+         playerEl.object3D.position[axis] -= state.speed;
        }
 
        if (playerEl.object3D.position[axis].toFixed(2) == goal_ax) {
@@ -145,7 +141,6 @@ void main() {
          let checked = checkAxis(current);
          if (checked) {
            state.current += 1;
-           console.log("CHECK PLEASE")
          }
        } else {
          console.log("ALRIGHT")
