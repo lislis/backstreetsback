@@ -1,0 +1,13 @@
+{
+  "name": "backstreetsback",
+  "version": "0.0.1",
+  "description": "js13k entry",
+  "main": "index.js",
+  "repository": "git@github.com:lislis/backstreetsback.git",
+  "author": "lislis <mail@lislis.de>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "tinymusic": "^1.0.0"
+  }
+}
