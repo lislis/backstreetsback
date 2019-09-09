@@ -1,4 +1,4 @@
-fetch('lyrics.txt')
+fetch('../data/lyrics.txt')
   .then((data) => data.json())
   .then((data) => {
     window.state.lyrics = JSON.parse(data);

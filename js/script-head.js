@@ -8,7 +8,7 @@ window.state = {
   lyrics: []
 }
 
-fetch('checkpoints.txt')
+fetch('../data/checkpoints.txt')
   .then((data) => data.json())
   .then((data) => {
     window.state.checkpoints = JSON.parse(data);
