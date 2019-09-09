@@ -6,49 +6,19 @@
     <script src="TinyMusic.js"></script>
     <script>
      // game state
-
-     let state = {
+     window.state = {
        current: 1,
        speed: 0.01,
-       score: 0
+       score: 0,
+       mode: 'title',
+       checkpoints: []
      }
 
-     // Prep the speech synthesis voice
-     var synth = window.speechSynthesis;
-     var voice = synth.getVoices()[2];
-
-     var otherVoice = synth.getVoices()[1];
-
-     // TinyMusic action!
-     var ac = new AudioContext();
-     var tempo = 120;
-
-     // https://tabs.ultimate-guitar.com/tab/backstreet_boys/everybody_backstreets_back_tabs_2427811
-     // rests are gut feeling ¯\_(ツ)_/¯
-     var sequence = new TinyMusic.Sequence( ac, tempo, [
-       'B3 e',
-       '- e',
-       'B3 e',
-       'A#3 e',
-       'A3 e',
-       'G#3 e',
-       'G3 e',
-       '- e',
-       'G3 e',
-       '- e',
-       'G3 e',
-       'A3 e',
-       'F#3 e',
-       '- h'
-     ]);
-
-     sequence.waveType = 'sine';
-     sequence.staccato = 0.05;
-     sequence.bass.gain.value = 30;
-     sequence.mid.gain.value = 5;
-     sequence.loop = true ;
-     sequence.gain.gain.value =  0.2;
-     sequence.play(); // and never stop!
+     fetch('checkpoints.txt')
+       .then((data) => data.json())
+       .then((data) => {
+         window.state.checkpoints = JSON.parse(data);
+       })
 
 
      AFRAME.registerShader('brix', {
@@ -79,28 +49,117 @@ void main() {
 
      AFRAME.registerComponent('cursor-listener', {
        init: function () {
+         // Prep the speech synthesis voice
+         var synth = window.speechSynthesis;
+         var voice = synth.getVoices()[2];
+         var otherVoice = synth.getVoices()[1];
+
          this.el.addEventListener('click', function (evt) {
-           this.setAttribute('material', 'color', 'white');
-           var utterThis = new SpeechSynthesisUtterance(this.getAttribute('text')['value']);
-           utterThis.voice = voice;
-           synth.speak(utterThis);
+           if (window.state.mode === 'play') {
+             console.log(window.state)
+             this.setAttribute('material', 'color', 'white');
+             var utterThis = new SpeechSynthesisUtterance(this.getAttribute('text')['value']);
+             utterThis.voice = voice;
+             synth.speak(utterThis);
+           }
          });
 
          this.el.addEventListener('animationcomplete', function (evt) {
-           this.remove();
-           var utterPoint = new SpeechSynthesisUtterance('Yeeaaaaaahh!');
-           utterPoint.voice = otherVoice;
-           synth.speak(utterPoint);
-           state.score ++;
-           document.querySelector('#score-hud').setAttribute('text', 'value', `score ${state.score}`);
+           if (window.state.mode === 'play' ) {
+             this.remove();
+             var utterPoint = new SpeechSynthesisUtterance('Yeeaaaaaahh!');
+             utterPoint.voice = otherVoice;
+             synth.speak(utterPoint);
+             state.score ++;
+             document.querySelector('#score-hud').setAttribute('text', 'value', `score ${state.score}`);
+           }
          });
        }
+     });
+
+     AFRAME.registerComponent('player-auto-move', {
+       schema: {},
+       init: function () {
+         console.log('init player');
+       },
+       tick: function () {
+         if (window.state.mode === 'play') {
+           let current = window.state.checkpoints[state.current];
+
+           if (current) {
+             let checked = this.checkAxis(current);
+             if (checked) {
+               window.state.current += 1;
+             }
+           } else {
+             window.state.mode = 'end';
+             console.log("ALRIGHT")
+           }
+         }
+       },
+
+       checkAxis: function (current) {
+         let axis = current.a;
+         let pos = current.p;
+         let player_ax = this.el.object3D.position[axis];
+         let goal_ax = pos[axis];
+
+         if (player_ax <= goal_ax) {
+           this.el.object3D.position[axis] += state.speed;
+         } else if (player_ax >= goal_ax) {
+           this.el.object3D.position[axis] -= state.speed;
+         }
+
+         if (this.el.object3D.position[axis].toFixed(2) == goal_ax) {
+           return true;
+         } else {
+           return false;
+         }
+       }
+     });
+
+
+     AFRAME.registerComponent('scene-play-music', {
+       schema: {},
+       init: function() {
+         // TinyMusic action!
+         var ac = new AudioContext();
+         var tempo = 120;
+
+         // https://tabs.ultimate-guitar.com/tab/backstreet_boys/everybody_backstreets_back_tabs_2427811
+         // rests are gut feeling ¯\_(ツ)_/¯
+         var sequence = new TinyMusic.Sequence( ac, tempo, [
+           'B3 e',
+           '- e',
+           'B3 e',
+           'A#3 e',
+           'A3 e',
+           'G#3 e',
+           'G3 e',
+           '- e',
+           'G3 e',
+           '- e',
+           'G3 e',
+           'A3 e',
+           'F#3 e',
+           '- h'
+         ]);
+
+         sequence.waveType = 'sine';
+         sequence.staccato = 0.05;
+         sequence.bass.gain.value = 30;
+         sequence.mid.gain.value = 5;
+         sequence.loop = true ;
+         sequence.gain.gain.value =  0.2;
+         sequence.play(); // and never stop!
+       }
+
      });
 
     </script>
   </head>
   <body>
-    <a-scene>
+    <a-scene scene-play-music>
       <a-entity id="walls" position="0 0 0">
         <a-entity  position="-8 4 -12" geometry="primitive: box; width: 13; height: 8" material="shader: brix"></a-entity>
         <a-entity  position="-2 4 -8" geometry="primitive: box; width: 15; height: 8" rotation="0 -90 0" material="shader: brix"></a-entity>
@@ -137,7 +196,7 @@ void main() {
                 text="value: Everybody!; width: 6; height: 2; align: center; font: monoid;" rotation="0 -90 0"
                 position="-9 1.6 -10"></a-entity>
 
-      <a-entity position="-14 1.6 -10" rotation="0 -90 0" id="player">
+      <a-entity position="-14 1.6 -10" rotation="0 -90 0" id="player" player-auto-move>
         <a-entity camera look-controls >
           <a-entity id="score-hud"
                     text="value: score 0; width: 2; height: 1; font: monoid; align: right; color: #333" position="0.0 0.5 -0.7" rotation="0 0 0"></a-entity>
@@ -150,101 +209,6 @@ void main() {
 
       <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="30" height="30" material="shader: flat" color="#111"></a-plane>
       <a-sky color="#fee"></a-sky>
-    </a-scene>a
-
-
-    <script>
-     var playerEl = document.querySelector('#player');
-
-     const checkpoints = {
-       1: {
-         a: 'x',
-         p: {x: -12}
-       },
-       2: {
-         a: 'x',
-         p: {x: -5},
-       },
-       3: {
-         a: 'z',
-         p: {z: 3},
-       },
-       4: {
-         a: 'x',
-         p: {x: -8},
-       },
-       5: {
-         a: 'z',
-         p: {z: 7},
-       },
-       6: {
-         a: 'z',
-         p: {z: 3},
-       },
-       7: {
-         a: 'x',
-         p: {x: 3},
-       },
-       8: {
-         a: 'z',
-         p: {z: 7.5},
-       },
-       9: {
-         a: 'x',
-         p: {x: 7.5},
-       },
-       10: {
-         a: 'z',
-         p: {z: -4},
-       },
-       11: {
-         a: 'x',
-         p: {x: 0},
-       },
-       12: {
-         a: 'z',
-         p: {z: -14}
-       }
-     }
-
-     function checkAxis (current) {
-       let axis = current.a;
-       let pos = current.p;
-       let player_ax = playerEl.object3D.position[axis];
-       let goal_ax = pos[axis];
-
-       if (player_ax <= goal_ax) {
-         playerEl.object3D.position[axis] += state.speed;
-       } else if (player_ax >= goal_ax) {
-         playerEl.object3D.position[axis] -= state.speed;
-       }
-
-       if (playerEl.object3D.position[axis].toFixed(2) == goal_ax) {
-         return true;
-       } else {
-         return false;
-       }
-     }
-
-     function handlePosition () {
-       let current = checkpoints[state.current];
-
-       if (current) {
-         let checked = checkAxis(current);
-         if (checked) {
-           state.current += 1;
-         }
-       } else {
-         console.log("ALRIGHT")
-       }
-     }
-
-     function moveCam(dt) {
-       handlePosition();
-       window.requestAnimationFrame(moveCam);
-     }
-     let aF = window.requestAnimationFrame(moveCam);
-
-    </script>
+    </a-scene>
   </body>
 </html>
