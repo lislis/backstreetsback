@@ -8,7 +8,7 @@
      // game state
      window.state = {
        current: 1,
-       speed: 0.01,
+       speed: 0.025,
        score: 0,
        mode: 'title',
        checkpoints: []
@@ -51,14 +51,14 @@ void main() {
        init: function () {
          // Prep the speech synthesis voice
          var synth = window.speechSynthesis;
-         var voice = synth.getVoices()[2];
+         var voice = synth.getVoices()[1];
          var otherVoice = synth.getVoices()[1];
 
          this.el.addEventListener('click', function (evt) {
            if (window.state.mode === 'play') {
              console.log(window.state)
              this.setAttribute('material', 'color', 'white');
-             this.setAttribute('animation', 'property: rotation; to: 0 0 180; dur: 1000;');
+             this.setAttribute('animation', 'property: rotation; to: 0 0 180; loop: false; dur: 800;');
              var utterThis = new SpeechSynthesisUtterance(this.getAttribute('text')['value']);
              utterThis.voice = voice;
              synth.speak(utterThis);
@@ -68,7 +68,7 @@ void main() {
          this.el.addEventListener('animationcomplete', function (evt) {
            if (window.state.mode === 'play' ) {
              this.remove();
-             var utterPoint = new SpeechSynthesisUtterance('Yeeaaaaaahh!');
+             var utterPoint = new SpeechSynthesisUtterance('Yeah!');
              utterPoint.voice = otherVoice;
              synth.speak(utterPoint);
              window.state.score ++;
@@ -107,7 +107,6 @@ void main() {
      });
 
      AFRAME.registerComponent('player-auto-move', {
-       schema: {},
        init: function () {
          console.log('init player');
        },
@@ -122,7 +121,6 @@ void main() {
              }
            } else {
              window.state.mode = 'end';
-             console.log("ALRIGHT")
            }
          }
        },
@@ -188,7 +186,7 @@ void main() {
     </script>
   </head>
   <body>
-    <a-scene scene-play-music>
+    <a-scene id="mainscene" scene-play-music>
 
       <a-entity id="title" geometry="primitive: plane; height: 3; width: 3" rotation="0 -90 0" position="-12 1.5 -10" material="color: black">
         <a-entity position="0 0.5 0" text="value: Backstreet's back; width: 5;align: center; font: monoid;"></a-entity>
@@ -212,20 +210,6 @@ void main() {
         <a-entity position="7 10 -11" geometry="width: 10; height: 22; depth: 12" rotation="" material="shader: brix"></a-entity>
       </a-entity>
 
-
-      <a-entity cursor-listener
-                geometry="primitive: plane; width: 2; height: 1;"
-                material="color: grey"
-                text="value: Rock your body!; width: 6; height: 2; align: center; font: monoid;"
-                rotation="0 -90 0"
-                position="-10 1.6 -10"></a-entity>
-
-      <a-entity cursor-listener
-                geometry="primitive: plane; width: 2; height: 1;"
-                material="color: grey"
-                text="value: Everybody!; width: 6; height: 2; align: center; font: monoid;" rotation="0 -90 0"
-                position="-9 1.6 -10"></a-entity>
-
       <a-entity position="-14 1.6 -10" rotation="0 -90 0" id="player" player-auto-move>
         <a-entity camera look-controls >
           <a-entity id="score-hud"
@@ -246,9 +230,48 @@ void main() {
                   position="0 -0.5 0.2"
                   text="value: Go to start!; width: 6; height: 2; align: center; font: monoid; color: white;"></a-entity>
       </a-entity>
-
       <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="30" height="30" material="shader: flat" color="#111"></a-plane>
       <a-sky color="#fee"></a-sky>
     </a-scene>
+    <script>
+
+     let lyrics = [
+       {v: "Everybody!", p: "-9 1.3 -11", r: "0 0 0"},
+       {v: "Rock your body!", p: "-2.6 1.3 -6", r: "0 -90 0"},
+       {v: "Everybody!", p: "-5.8 2.3 -4.3", r: "0 90 0"},
+       {v: "Rock your body!", p: "-3 3 -1.3", r: "0 -90 0"},
+       {v: "Backstreet's back!", p: "-9 4 0.1", r: "0 0 0"},
+       {v: "Oh my god, we're back again!", p: "-11.3 3 4.5", r: "0 90 0"},
+       {v: "Brothers, sisters everybody sing!", p: "-9.8 3.4 10.1", r: "0 -180 0"},
+       {v: "Gonna bring the flavor, show you how!", p: "-6.1 2 8", r: "0 -90 0"},
+       {v: "Got a question for you better answer now!", p: "-3.4 2.8 5.8", r: "0 -180 0"},
+       {v: "Am I original?", p: "-0.1 1.3 5.9", r: "0 180 0"},
+       {v: "Am I the only one?", p: "0 2.3 2.6", r: "0 0 0"},
+       {v: "Am I sexual?", p: "3.3 3.1 2.6", r: "0 0 0"},
+       {v: "Am I everything you need?", p: "4.8 3.3 10.4", r: "0 180 0"},
+       {v: "You better rock your body now!", p: "10.4 1.4 6.4", r: "0 -90 0"},
+       {v: "Everybody!", p: "10.4 1.4 0", r: "0 -90 0"},
+       {v: "Rock your body!", p: "7.3 4.4 -4.7", r: "0 0 0"},
+       {v: "Everybody!", p: "3.6 2.7 -2.7", r: "0 180 0"},
+       {v: "Rock your body right!", p: "-1.2 1.3 -6.6", r: "0 90 0"},
+       {v: "Backstreet's back!", p: "1.9 2.8 -8.8", r: "0 -90 0"},
+       {v: "Alright!", p: "-1 2.2 -11", r: "0 90 0"}
+     ]
+
+     let scene = document.getElementById('mainscene');
+     lyrics.forEach((v,i) => {
+       let e = document.createElement('a-entity');
+       e.classList.add('lyric');
+       e.setAttribute('geometry','primitive: plane; width: 4; height: 1;');
+       e.setAttribute('material', 'color: grey');
+       e.setAttribute('text', `value: ${v.v}; width=: 6; height: 2; align: center; font: monoid;`);
+       e.setAttribute('rotation', v.r);
+       e.setAttribute('position', v.p);
+       e.setAttribute("cursor-listener", true);
+       e.setAttribute('animation', 'property: scale; from: 0.7 0.7 0.7; to: 0.9 0.9 0.9; loop: true; dir: alternate; dur: 800;');
+       scene.appendChild(e);
+     })
+
+    </script>
   </body>
 </html>
