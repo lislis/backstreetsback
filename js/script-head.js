@@ -4,15 +4,58 @@ window.state = {
   speed: 0.025,
   score: 0,
   mode: 'title',
-  checkpoints: [],
+  checkpoints: {
+    1: {
+      a: 'x',
+      p: {x: -12}
+    },
+    2: {
+      a: 'x',
+      p: {x: -5},
+    },
+    3: {
+      a: 'z',
+      p: {z: 3},
+    },
+    4: {
+      a: 'x',
+      p: {x: -8},
+    },
+    5: {
+      a: 'z',
+      p: {z: 7},
+    },
+    6: {
+      a: 'z',
+      p: {z: 3},
+    },
+    7: {
+      a: 'x',
+      p: {x: 3},
+    },
+    8: {
+      a: 'z',
+      p: {z: 7.5},
+    },
+    9: {
+      a: 'x',
+      p: {x: 7.5},
+    },
+    10: {
+      a: 'z',
+      p: {z: -4},
+    },
+    11: {
+      a: 'x',
+      p: {x: 0},
+    },
+    12: {
+      a: 'z',
+      p: {z: -14}
+    }
+  },
   lyrics: []
-}
-
-fetch('../data/checkpoints.txt')
-  .then((data) => data.json())
-  .then((data) => {
-    window.state.checkpoints = JSON.parse(data);
-  })
+};
 
 
 AFRAME.registerShader('brix', {
