@@ -239,3 +239,13 @@ AFRAME.registerComponent('scene-play-music', {
     (); // and never stop!
   }
 });
+
+
+AFRAME.registerComponent('exit-vr', {
+  init: function() {
+    this.el.addEventListener('click', function (evt) {
+      let scene = document.getElementById('mainscene');
+      scene.exitVR();
+    });
+  }
+});
