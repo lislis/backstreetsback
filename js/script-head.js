@@ -1,9 +1,12 @@
 // game state
 window.state = {
   current: 1,
-  speed: 0.025,
+  speed: 0.025, // needs to be able to reach an even number
   score: 0,
   mode: 'title',
+  player: {
+    start_pos: {x: -14, y: 1.6, z: -10}
+  },
   checkpoints: {
     1: {
       a: 'x',
@@ -35,11 +38,11 @@ window.state = {
     },
     8: {
       a: 'z',
-      p: {z: 7.5},
+      p: {z: 8},
     },
     9: {
       a: 'x',
-      p: {x: 7.5},
+      p: {x: 8},
     },
     10: {
       a: 'z',
@@ -112,7 +115,6 @@ AFRAME.registerComponent('cursor-listener', {
 
     this.el.addEventListener('click', function (evt) {
       if (window.state.mode === 'play') {
-        //console.log(window.state)
         this.setAttribute('material', 'color', 'white');
         this.setAttribute('animation', 'property: rotation; to: 0 0 180; loop: false; dur: 800;');
         var utterThis = new SpeechSynthesisUtterance(this.getAttribute('text')['value']);
@@ -157,23 +159,20 @@ AFRAME.registerComponent('end-plane', {
   init: function () {
     this.el.setAttribute('animation', 'property: scale; from: 0.7 0.7 0.7; to: 1 1 1; loop: true; dir: alternate; dur: 800;');
     this.el.addEventListener('click', function (evt) {
-      window.location.reload();
+      gen_title_screen();
+      gen_lyrics();
+      reset_player_score();
     });
   }
 });
 
 AFRAME.registerComponent('player-auto-move', {
-  init: function () {
-    //console.log('init player');
-  },
   tick: function () {
     if (window.state.mode === 'play') {
       let current = window.state.checkpoints[state.current];
-
       if (current) {
         let checked = this.checkAxis(current);
         if (checked) {
-          //console.log(current);
           window.state.current += 1;
         }
       } else {
@@ -249,3 +248,57 @@ AFRAME.registerComponent('exit-vr', {
     });
   }
 });
+
+
+function gen_lyrics() {
+  let scene = document.getElementById('mainscene');
+
+  window.state.lyrics.forEach((v,i) => {
+    let e = document.createElement('a-entity');
+    e.classList.add('lyric');
+    e.setAttribute('geometry','primitive: plane; width: 4; height: 1;');
+    e.setAttribute('material', 'color: grey');
+    e.setAttribute('text', `value: ${v.v}; width=: 6; height: 2; align: center; font: monoid;`);
+    e.setAttribute('rotation', v.r);
+    e.setAttribute('position', v.p);
+    e.setAttribute('cursor-listener', true);
+    e.setAttribute('animation', 'property: scale; from: 0.7 0.7 0.7; to: 0.9 0.9 0.9; loop: true; dir: alternate; dur: 800;');
+    scene.appendChild(e);
+  });
+}
+
+function gen_title_screen() {
+  let scene = document.getElementById('mainscene');
+
+  let c = document.createElement('a-entity');
+  c.id = 'title';
+  c.setAttribute('geometry','primitive: plane; width: 3; height: 3;');
+  c.setAttribute('rotation', '0 -90 0');
+  c.setAttribute('position', '-12 1.5 -10');
+  c.setAttribute('material', 'color: black');
+
+  let t = document.createElement('a-entity');
+  t.setAttribute('position', '0 0.8 0');
+  t.setAttribute('text', 'value: backstreetsback; width: 6; align: center; font: monoid;');
+
+  let b = document.createElement('a-entity');
+  b.setAttribute('geometry', 'primitive: plane; width: 2; height: 1;');
+  b.setAttribute('material', 'color: grey');
+  b.setAttribute('position', '0 -0.4 0.2');
+  b.setAttribute('title-plane', true);
+  b.setAttribute('text', 'value: Alright!; width: 6; height: 2; align: center; font: monoid; color: white;');
+
+  c.appendChild(t);
+  c.appendChild(b);
+  scene.appendChild(c);
+}
+
+function reset_player_score() {
+  let player = document.querySelector('#player');
+  player.object3D.position.x = window.state.player.start_pos.x;
+  player.object3D.position.y = window.state.player.start_pos.y;
+  player.object3D.position.z = window.state.player.start_pos.z;
+  window.state.score = 0;
+  window.state.mode = 'title';
+  window.state.current = 1;
+}

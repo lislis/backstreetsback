@@ -8,14 +8,6 @@
   </head>
   <body>
     <a-scene id="mainscene" scene-play-music>
-      <a-entity id="title" geometry="primitive: plane; height: 3; width: 3" rotation="0 -90 0" position="-12 1.5 -10" material="color: black">
-        <a-entity position="0 0.5 0" text="value: Backstreet's back; width: 5;align: center; font: monoid;"></a-entity>
-        <a-entity title-plane
-                  geometry="primitive: plane; width: 2; height: 1;"
-                  material="color: grey"
-                  position="0 -0.2 0.2"
-                  text="value: Alright!; width: 6; height: 2; align: center; font: monoid; color: white;"></a-entity>
-      </a-entity>
 
       <a-entity id="walls" position="0 0 0">
         <a-entity  position="-8 4 -12" geometry="primitive: box; width: 13; height: 8" material="shader: brix"></a-entity>
@@ -31,10 +23,11 @@
       </a-entity>
 
       <a-entity position="-14 1.6 -10" rotation="0 -90 0" id="player" player-auto-move>
-
         <a-entity camera look-controls >
           <a-entity id="score-hud"
-                    text="value: score 0; width: 2; height: 1; font: monoid; align: right; color: black" position="0.0 0.5 -0.7" rotation="0 0 0"></a-entity>
+                    text="value: score 0; width: 2; height: 1; font: monoid; align: right; color: black"
+                    position="0.0 0.5 -0.7"
+                    rotation="0 0 0"></a-entity>
           <a-entity cursor="fuse: true; fuseTimeout: 500"
                     position="0 0 -1"
                     geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
@@ -49,9 +42,9 @@
                   geometry="primitive: plane; width: 2; height: 1;"
                   material="color: grey"
                   position="0 -0.5 0.2"
-                  text="value: Go to start!; width: 6; height: 2; align: center; font: monoid; color: white;"></a-entity>
+                  text="value: Alright!; width: 6; height: 2; align: center; font: monoid; color: white;"></a-entity>
       </a-entity>
-      <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="30" height="30" material="shader: flat" color="#111"></a-plane>
+      <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="35" height="35" material="shader: flat" color="#111"></a-plane>
       <a-sky color="#fee"></a-sky>
     </a-scene>
     <script src="js/script-footer.js"></script>
