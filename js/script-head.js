@@ -112,7 +112,7 @@ AFRAME.registerComponent('cursor-listener', {
 
     this.el.addEventListener('click', function (evt) {
       if (window.state.mode === 'play') {
-        console.log(window.state)
+        //console.log(window.state)
         this.setAttribute('material', 'color', 'white');
         this.setAttribute('animation', 'property: rotation; to: 0 0 180; loop: false; dur: 800;');
         var utterThis = new SpeechSynthesisUtterance(this.getAttribute('text')['value']);
@@ -138,7 +138,7 @@ AFRAME.registerComponent('cursor-listener', {
 AFRAME.registerComponent('title-plane', {
   init: function () {
     var synth = window.speechSynthesis;
-    var voice = synth.getVoices()[2];
+    var voice = synth.getVoices()[0];
     this.el.setAttribute('animation', 'property: scale; from: 0.7 0.7 0.7; to: 1 1 1; loop: true; dir: alternate; dur: 800;');
     this.el.addEventListener('click', function (evt) {
       this.setAttribute('animation', 'property: rotation; to: 0 0 180; dir: normal; dur: 1000; loop: 1;');
@@ -164,7 +164,7 @@ AFRAME.registerComponent('end-plane', {
 
 AFRAME.registerComponent('player-auto-move', {
   init: function () {
-    console.log('init player');
+    //console.log('init player');
   },
   tick: function () {
     if (window.state.mode === 'play') {
@@ -173,7 +173,7 @@ AFRAME.registerComponent('player-auto-move', {
       if (current) {
         let checked = this.checkAxis(current);
         if (checked) {
-          console.log(current);
+          //console.log(current);
           window.state.current += 1;
         }
       } else {
@@ -208,7 +208,7 @@ AFRAME.registerComponent('scene-play-music', {
   init: function() {
     // TinyMusic action!
     var ac = new AudioContext();
-    var tempo = 120;
+    var tempo = 130;
 
     // https://tabs.ultimate-guitar.com/tab/backstreet_boys/everybody_backstreets_back_tabs_2427811
     // rests are gut feeling ¯\_(ツ)_/¯
@@ -235,6 +235,7 @@ AFRAME.registerComponent('scene-play-music', {
     sequence.mid.gain.value = 5;
     sequence.loop = true ;
     sequence.gain.gain.value =  0.2;
-    sequence.play(); // and never stop!
+    sequence.play
+    (); // and never stop!
   }
 });

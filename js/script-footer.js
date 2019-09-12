@@ -15,7 +15,7 @@ window.state.lyrics.forEach((v,i) => {
 
 
 scene.addEventListener('enter-vr', function () {
-  console.log('enter');
+  //console.log('enter');
   let player = document.querySelector('#player');
-  player.setAttribute('position', 'y', '1.6');
+  playe.object3D.position.y = 1.6;
 });
